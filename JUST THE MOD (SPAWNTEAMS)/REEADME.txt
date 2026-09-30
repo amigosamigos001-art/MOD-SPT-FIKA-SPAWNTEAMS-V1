@@ -1,0 +1,90 @@
+Configuration & Setup Guide
+1. Installation
+Download SpawnTeams.dll from the releases section.
+
+Place the .dll file into your game folder at:
+
+Plaintext
+
+
+<TarkovFolder>/BepInEx/plugins/
+Mandatory Requirement: ALL players (Host and Clients) must install SpawnTeams.dll in their client folder.
+
+Do NOT place this plugin inside the SPT Server directory (user/mods/). It is strictly a client-side plugin.
+
+2. Configuration File (com.spawnteams.fika.cfg)
+The configuration file is automatically generated the first time you run the game with the plugin installed. It is located at:
+
+Plaintext
+
+
+<TarkovFolder>/BepInEx/config/com.spawnteams.fika.cfg
+You can customize the settings by editing the file with any text editor (e.g., Notepad) or directly in-game using configuration managers:
+
+Ini, TOML
+
+
+[1. General]
+
+## Enable or disable the team spawn logic. Set to false to return to vanilla Fika behavior.
+# Setting type: Boolean
+# Default value: true
+Activado = true
+
+## Total number of active teams in the match (2 or 3).
+# Setting type: Int32
+# Default value: 3
+# Acceptable values: 2, 3
+Numero de equipos = 3
+
+[2. Mi equipo]
+
+## Your default team assignment. Set to 0 for no team (vanilla spawn).
+# Setting type: Int32
+# Default value: 1
+# Acceptable value range: From 0 to 3
+Equipo = 1
+
+## Hotkey used to toggle the team selection overlay in-game.
+# Setting type: KeyboardShortcut
+# Default value: F7
+Tecla de la UI = F7
+
+[3. Avanzado]
+
+## Deprecated setting. Keep as false. Memory overrides handle spawn separation automatically.
+# Setting type: Boolean
+# Default value: false
+Forzar spawn compartido (Obsoleto) = false
+3. Step-by-Step Usage
+Create/Join Lobby: Host or join a Fika co-op match as you normally would.
+
+Open UI: Press F7 in the lobby to toggle the Spawn Teams window.
+
+Select Teams:
+
+Have each player choose their respective team (e.g., Host selects Team 1, Player 2 selects Team 2).
+
+Check the Ready Players list in the overlay to ensure all connected players are registered.
+
+Launch Raid: The host starts the match. The mod will automatically override Fika's forced SamePlace spawn behavior in memory and assign team members to separate spawn locations across the map.
+
+4. Optional: BepInEx Console Debugging
+To verify real-time team assignment and network synchronization during loading screens:
+
+Open <TarkovFolder>/BepInEx/config/BepInEx.cfg.
+
+Locate the [Logging.Console] section and set Enabled = true:
+
+Ini, TOML
+
+
+[Logging.Console]
+Enabled = true
+During match loading, look for the following output in the BepInEx console window:
+
+Plaintext
+
+
+[Info : Fika Spawn Teams] [SpawnTeams] TeamSyncPacket enviado: Team X
+[Info : Fika Spawn Teams] [SpawnTeams] Request modificado: 'GROUP_ID' -> 'GROUP_ID_team_X' (Team X)
