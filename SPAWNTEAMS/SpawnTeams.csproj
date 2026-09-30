@@ -1,0 +1,91 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Si al compilar te da errores de "predefined type not defined" o de netstandard,
+         cambia net471 por netstandard2.1 (depende de la version de Unity del EFT de tu SPT 4.1.6). -->
+    <TargetFramework>net471</TargetFramework>
+    <AssemblyName>SpawnTeams</AssemblyName>
+    <RootNamespace>SpawnTeams</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugType>portable</DebugType>
+    <NoWarn>CS0649;CS0169</NoWarn>
+  </PropertyGroup>
+
+  <!-- EDITA ESTA RUTA: carpeta raiz de tu instalacion de SPT -->
+  <PropertyGroup>
+    <SptDir>D:\tarkov mods 2</SptDir>
+    <ManagedDir>$(SptDir)\EscapeFromTarkov_Data\Managed</ManagedDir>
+    <PluginsDir>$(SptDir)\BepInEx\plugins</PluginsDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Antes se pedia System.Memory por NuGet, pero la restauracion no lo estaba trayendo
+         de verdad (0,4s es demasiado rapido para bajar un paquete nuevo). El propio juego ya
+         trae estas tres DLL en Managed porque Fika.Core las necesita para correr; las usamos
+         directamente, sin depender de que NuGet funcione. -->
+    <Reference Include="System.Memory">
+      <HintPath>$(ManagedDir)\System.Memory.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Buffers">
+      <HintPath>$(ManagedDir)\bsg.system.buffers.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>$(ManagedDir)\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>$(SptDir)\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(SptDir)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(ManagedDir)\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(ManagedDir)\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Referenciada directamente porque FikaEventDispatcher / IFikaNetworkManager son
+         API publica de modding (confirmada por inspeccion de IL), no un detalle interno. -->
+    <Reference Include="Fika.Core">
+      <HintPath>$(PluginsDir)\Fika\Fika.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Fika.Core.dll pide netstandard 2.1, pero net471 trae por defecto la version 2.0.
+         El propio juego (Unity) trae su propia netstandard.dll mas nueva en Managed; la
+         referenciamos explicitamente para que el compilador use esa en vez de la de net471. -->
+    <Reference Include="netstandard">
+      <HintPath>$(ManagedDir)\netstandard.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Assembly-CSharp SIGUE sin referenciarse: el DTO de spawn se sigue leyendo por
+         reflexion, para no acoplarnos a algo que cambia con cada parche del juego. -->
+  </ItemGroup>
+
+  <!-- Copia automatica al build. Comenta este bloque si prefieres copiar a mano. -->
+  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="Exists('$(PluginsDir)')">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsDir)" ContinueOnError="true" />
+  </Target>
+
+</Project>
